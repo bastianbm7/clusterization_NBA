@@ -1,5 +1,7 @@
 # Análisis Interactivo de Clústers de Jugadores de la NBA en el periodo de 2013 a 2023 mediante Métodos de Agrupamiento Basados en Densidad
-***IECD421: Visualización de datos - Bastián Barraza*** [Link to dashboard in Streamlit]([https://www.openai.com](https://clustering-comparison.streamlit.app/))
+***IECD421: Visualización de datos - Bastián Barraza*** 
+
+[Link to dashboard in Streamlit]([https://www.openai.com](https://clustering-comparison.streamlit.app/))
 
 ### Introducción
 
