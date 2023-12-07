@@ -21,7 +21,7 @@ def filter_data(df_):
     df = df_[columns_to_select]
 
     # Change quantity of data:
-    n = st.number_input('Selecciona la cantidad de datos', value = 30)
+    n = st.number_input('Selecciona la cantidad de datos', value = 100)
     df = df.sample(n=n, random_state = 3, replace = False)
     
     # Create a df to filter data based on columns values
@@ -60,9 +60,9 @@ menu_option = option_menu(None, ["Home", "DBSCAN", "HDBSCAN"],
                           menu_icon="cast", default_index=0, orientation="horizontal",
                           styles={
                               "container": {"padding": "0!important", "background-color": "#fafafa"},
-                                "icon": {"color": "orange", "font-size": "25px"},
-                                  "nav-link": {"font-size": "17px", "text-align": "left", "margin": "10px", "--hover-color": "#fffff"},
-                                  "nav-link-selected": {"background-color": "black"},
+                                "icon": {"color": "#E74C3C ", "font-size": "25px"},
+                                  "nav-link": {"font-size": "17px", "text-align": "left", "margin": "12px", "--hover-color": "#fffff"},
+                                  "nav-link-selected": {"background-color": "#95A5A6"},
                         })
 
 
