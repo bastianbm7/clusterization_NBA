@@ -52,14 +52,27 @@ from codes import graphs
 #dbscan = importr('dbscan')
 
 def home():
-    st.markdown("""## Análisis Interactivo de Clústers de Jugadores de la NBA en el periodo de 2013 a 2023 mediante Métodos de Agrupamiento Basados en Densidad
-#### Objetivo general:
-- Crear un tablero interactivo para comparar dos métodos de clustering basado en densidades con la capacidad de modificar los parámetros para los datos de las estadísticas de los jguadores de la NBA entre 2013 a 2023
+    
+    colored_header(
+        label="Análisis Interactivo de Clústers de Jugadores de la NBA en el periodo de 2013 a 2023 mediante Métodos de Agrupamiento Basados en Densidad",
+        description="IECD421: Visualización de datos - Bastián Barraza",
+        color_name="light-blue-90",
+        )
+
+    st.markdown("""#### Introducción
+
+- El propósito principal de este panel actual es facilitar la aplicación de dos tipos de clustering por densidades de manera intuitiva. Esto posibilita la visualización de la variación de los clústeres al ajustar los parámetros de los algoritmos.
+
+- Se han aplicado clustering basados en densidades a las estadísticas de los jugadores de la NBA durante las temporadas comprendidas entre los años 2013 y 2023. """)
+    
+    st.divider()
+    st.markdown("""#### Objetivo general:
+- Crear un tablero interactivo para comparar dos métodos de clustering basado en densidades con la capacidad de modificar los parámetros para los datos de las estadísticas de los jguadores de la NBA entre 2013 a 2023.
 
 #### Objetivos específicos:
-- Aplicar clustering DBSCAN y OPTICS para identificar jugadores similares según la distribución de densidades de las variables seleccionadas
-- Identificar parámetros óptimos para que los jugadores entre grupos sean similares, mientras que la distancia entre grupos sea la mayor posible.
-                """)
+- Aplicar clustering DBSCAN y HDBSCAN para identificar jugadores similares según la distribución de densidades de las variables seleccionadas
+- Identificar parámetros óptimos para que los jugadores entre grupos sean similares, mientras que la distancia entre grupos sea la mayor posible.""")
+
 # Create DBSCAN Page
 def page_DBSCAN(df):
 
@@ -288,7 +301,7 @@ def page_DBSCAN(df):
         colored_header(
         label="Cambia los parámetros de DBSCAN",
         description="",
-        color_name="light-blue-20",
+        color_name="red-90",
         )
         # Slider with eps value
         eps = st.number_input('Selecciona el valor de eps', value = 0.5)
@@ -328,14 +341,36 @@ def page_DBSCAN(df):
         metrics_sidebar(total_clusters, noise_quantity)
 
     # Page title
-    st.markdown("# Density-Based Spatial Clustering of Applications with Noise (DBSCAN) ")
+    colored_header(
+        label="Density-Based Spatial Clustering of Applications with Noise (DBSCAN)",
+        description="",
+        color_name="light-blue-90",
+        )
+    st.markdown("""
+DBSCAN es un algoritmo de clustering que se basa en la densidad de los datos para agrupar puntos cercanos en regiones densas y separar regiones menos densas. Este método estadístico es especialmente útil para identificar agrupamientos de forma no paramétrica y detectar puntos anómalos en conjuntos de datos.
+    
+### Principales Conceptos
+- **Densidad:** DBSCAN define la densidad en términos de la cantidad de puntos dentro de una vecindad específica. Puntos con suficientes vecinos cercanos se consideran parte de una región densa.
+
+- **Puntos Núcleo:** Puntos dentro de regiones densas que tienen al menos un número mínimo predefinido de vecinos dentro de una distancia especificada.
+
+- **Ruido:** Puntos que no pertenecen a ninguna región densa y no cumplen con los criterios de densidad mínima.
+
+### Ventajas y Consideraciones
+
+- **Robustez ante Formas Irregulares:** DBSCAN es efectivo para identificar agrupamientos de formas no convencionales y puede manejar conjuntos de datos con densidades variables.
+
+- **Sensibilidad a Parámetros:** La elección adecuada de varepsilon y MinPts es crucial y puede afectar significativamente los resultados del clustering.
+
+- **Resistente al Ruido:** Al asignar puntos como ruido, DBSCAN es robusto ante valores atípicos y no depende de la forma geométrica de los agrupamientos.
+""")
     st.divider()
     
     # Make first dashboard ---------
     colored_header(
         label="Descripción de cada grupo",
         description="Selecciona las zonas de interés acercando el ratón a los gráficos",
-        color_name="light-blue-20",
+        color_name="light-blue-90",
         )
     
 
@@ -392,7 +427,7 @@ def page_DBSCAN(df):
     colored_header(
         label="Descripción de DBSCAN",
         description="Rendimiento de cada grupo",
-        color_name="light-blue-20",
+        color_name="light-blue-90",
         )
 
     st.plotly_chart(fig_minPts, clear_figure  = True, use_container_width=True)
@@ -611,7 +646,7 @@ def HDBSCAN_page(df):
         colored_header(
         label="Cambia los parámetros de HDBSCAN",
         description="",
-        color_name="light-blue-20",
+        color_name="red-90",
         )
         # Min of clusters to use in HDBSCAN
         min_cluster = st.number_input('Selecciona el mínimo de clusters', value = 5)
@@ -623,15 +658,40 @@ def HDBSCAN_page(df):
 
     
     
-    # Page title
-    st.markdown("# Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN) ")
+    # Page title    
+    colored_header(
+        label="Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN)",
+        description="",
+        color_name="light-blue-90",
+        )
+    st.markdown("""HDBSCAN es una extensión de DBSCAN que incorpora la idea de la densidad en la construcción de una estructura jerárquica de clusters. Este algoritmo estadístico es particularmente útil para identificar clusters de forma variable y manejar conjuntos de datos con densidades variables de manera más flexible.
+
+### Principales Conceptos
+
+- **Densidad y Persistencia:** HDBSCAN introduce el concepto de persistencia, que mide la estabilidad de un cluster en múltiples escalas de densidad. Los clusters más densos y persistentes se consideran más significativos.
+
+- **Árbol de Clustering:** HDBSCAN utiliza un árbol de clustering para representar la jerarquía de los clusters en diferentes niveles de densidad. Esto permite la identificación de clusters a diferentes escalas.
+
+- **Afinidad Mutual:** HDBSCAN utiliza un enfoque de afinidad mutual para calcular la conectividad entre puntos, considerando tanto la densidad como la distancia entre ellos.
+
+### Ventajas y Consideraciones
+
+- **Jerarquía de Clusters:** HDBSCAN proporciona una visión jerárquica de la estructura de clusters, permitiendo la identificación de clusters a diferentes niveles de detalle.
+
+- **Robustez ante Densidades Variables:** HDBSCAN es capaz de manejar conjuntos de datos con densidades variables y identificar clusters de forma adaptativa.
+
+- **Menos Sensible a Parámetros:** HDBSCAN reduce la sensibilidad a la selección de parámetros en comparación con DBSCAN, ya que la jerarquía proporciona una variedad de clusters a diferentes niveles de resolución.
+
+- **Afinidad Mutual:** La utilización de afinidad mutual mejora la capacidad de HDBSCAN para identificar clusters en espacios de alta dimensionalidad.
+
+""")
     st.divider()
     
     # Make first dashboard ---------
     colored_header(
         label="Descripción de cada grupo",
         description="Selecciona las zonas de interés acercando el ratón a los gráficos",
-        color_name="light-blue-20",
+        color_name="light-blue-90",
         )
     add_top_metrics(df,clusterer)
     # Make title of filtering 
@@ -687,7 +747,7 @@ def HDBSCAN_page(df):
     colored_header(
         label="Descripción de HDBSCAN",
         description="Distancias y jerarquía de cada grupo",
-        color_name="light-blue-20",
+        color_name="light-blue-90",
         )
 
     # Create a 2x1 grid to write the graphs

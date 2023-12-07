@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import base64
 
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -11,30 +10,6 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 import random
 
 from codes import pages
-
-
-# Use local CSS
-def get_base64(bin_file):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-
-def set_background(png_file):
-    bin_str = get_base64(png_file)
-    page_bg_img = '''
-    <style>
-    body {
-    background-image: url("data:image/png;base64,%s");
-    background-size: cover;
-    }
-    </style>
-    ''' % bin_str
-    st.markdown(page_bg_img, unsafe_allow_html=True)
-
-set_background('background/dalle3.png')
-
-
 
 
 def filter_data(df_):
@@ -74,7 +49,7 @@ def filter_data(df_):
     return df, columns_to_select
 
 # Read data
-df = pd.read_csv('data\\PPG_data.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/bastianbm7/clusterization_NBA/main/data/PPG_data.csv')
 
 # Create menu on top of the page with all pages:
 # 1.- Home 
@@ -100,7 +75,7 @@ with st.sidebar:
     colored_header(
         label="Filtra tus datos",
         description="Cambia los parámetros a tu medida",
-        color_name="light-blue-20",
+        color_name="red-90",
         )
     df, columns_to_select = filter_data(df)
 # ---------------------
