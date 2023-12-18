@@ -25,7 +25,6 @@ from sklearn import metrics
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 
-from codes import graphs
 
 def home():
     

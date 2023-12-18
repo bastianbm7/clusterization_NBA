@@ -9,7 +9,6 @@ from streamlit_extras.colored_header import colored_header
 from sklearn.preprocessing import StandardScaler, RobustScaler
 import random
 
-from codes import pages
 
 
 def filter_data(df_):
