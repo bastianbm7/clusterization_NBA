@@ -26,30 +26,6 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 
 from codes import graphs
-# os.environ['R_HOME'] = f'C:\Program Files\R\R-4.3.2'
-
-# %load_ext rpy2.ipython
-#import rpy2.rinterface
-#
-#from rpy2.robjects import r, pandas2ri
-#from rpy2.robjects.packages import importr
-#import rpy2.robjects as robjects
-#from rpy2.robjects.conversion import localconverter
-#import rpy2.robjects as ro
-
-# Install necesary packages on R
-
-# utils.install_packages('dplyr') 
-# utils.install_packages('tidyr') 
-# utils.install_packages('dbscan') 
-
-
-# Import packages on R
-#utils = importr('utils')
-#base = importr('base')
-#dplyr = importr('dplyr')
-#tidyr = importr('tidyr')
-#dbscan = importr('dbscan')
 
 def home():
     

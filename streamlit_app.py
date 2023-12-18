@@ -64,8 +64,7 @@ menu_option = option_menu(None, ["Home", "DBSCAN", "HDBSCAN"],
                                   "nav-link": {"font-size": "17px", "text-align": "left", "margin": "12px", "--hover-color": "#fffff"},
                                   "nav-link-selected": {"background-color": "#95A5A6"},
                         })
-
-
+        
 # ---------------------
 # Page 1: Home
 if menu_option == "Home":
@@ -86,3 +85,4 @@ if menu_option == 'DBSCAN':
 if menu_option == 'HDBSCAN':
     pages.HDBSCAN_page(df)
     
+
