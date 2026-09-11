@@ -9,7 +9,7 @@ from streamlit_extras.colored_header import colored_header
 from sklearn.preprocessing import StandardScaler, RobustScaler
 import random
 
-from codes import pages
+from codigos import pages
 
 
 def filter_data(df_):
@@ -49,7 +49,7 @@ def filter_data(df_):
     return df, columns_to_select
 
 # Read data
-df = pd.read_csv('https://raw.githubusercontent.com/bastianbm7/clusterization_NBA/main/data/PPG_data.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/bastianbm7/clusterization_NBA/main/datos/bases/PPG_data.csv')
 
 # Create menu on top of the page with all pages:
 # 1.- Home 

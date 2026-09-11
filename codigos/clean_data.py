@@ -2,7 +2,7 @@ import pandas as pd
 
 # -------------------------
 # Read data
-df = pd.read_csv('data\\Player Per Game.csv')
+df = pd.read_csv('../datos/bases/Player Per Game.csv')
 
 
 # -------------------------
@@ -39,4 +39,4 @@ df_filter.duplicated().sum()
 
 # -------------------------
 # Export data
-df_filter.to_csv('data\\PPG_data.csv', index=False)
+df_filter.to_csv('../datos/bases/PPG_data.csv', index=False)
