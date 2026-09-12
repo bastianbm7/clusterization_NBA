@@ -22,14 +22,15 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import cdist
 from sklearn import metrics
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, KMeans
 from sklearn.metrics import davies_bouldin_score, silhouette_score
+from sklearn.decomposition import PCA
 
 
 def home():
     
     colored_header(
-        label="Análisis Interactivo de Clústers de Jugadores de la NBA en el periodo de 2013 a 2023 mediante Métodos de Agrupamiento Basados en Densidad",
+        label="Análisis Interactivo de Clústers de Jugadores de la NBA en el periodo de 2013 a 2025 mediante Métodos de Agrupamiento Basados en Densidad",
         description="IECD421: Visualización de datos - Bastián Barraza",
         color_name="light-blue-90",
         )
@@ -38,11 +39,11 @@ def home():
 
 - El propósito principal de este panel actual es facilitar la aplicación de dos tipos de clustering por densidades de manera intuitiva. Esto posibilita la visualización de la variación de los clústeres al ajustar los parámetros de los algoritmos.
 
-- Se han aplicado clustering basados en densidades a las estadísticas de los jugadores de la NBA durante las temporadas comprendidas entre los años 2013 y 2023. """)
+- Se han aplicado clustering basados en densidades a las estadísticas de los jugadores de la NBA durante las temporadas comprendidas entre los años 2013 y 2025. """)
     
     st.divider()
     st.markdown("""#### Objetivo general:
-- Crear un tablero interactivo para comparar dos métodos de clustering basado en densidades con la capacidad de modificar los parámetros para los datos de las estadísticas de los jguadores de la NBA entre 2013 a 2023.
+- Crear un tablero interactivo para comparar dos métodos de clustering basado en densidades con la capacidad de modificar los parámetros para los datos de las estadísticas de los jguadores de la NBA entre 2013 a 2025.
 
 #### Objetivos específicos:
 - Aplicar clustering DBSCAN y HDBSCAN para identificar jugadores similares según la distribución de densidades de las variables seleccionadas
@@ -735,3 +736,153 @@ def HDBSCAN_page(df):
     # Second row
     col1, col2 = st.columns(2)
     my_grid.pyplot(condensed_2, clear_figure  = True, use_container_width=True)
+
+
+# --------------------------------------------------------------------------
+# Hallazgos page: fixed (non-interactive) findings -- optimal parameters for
+# DBSCAN/HDBSCAN found offline via grid search, K-Means as a baseline
+# comparison, a PCA 2D projection, and 4 named player archetypes.
+#
+# Uses its own fixed feature set (independent of the sidebar filters used by
+# the DBSCAN/HDBSCAN pages) since this page reports a single settled result,
+# not another interactive exploration.
+FEATURES_HALLAZGOS = ['pts_per_game', 'trb_per_game', 'ast_per_game',
+                       'stl_per_game', 'blk_per_game', 'tov_per_game']
+
+ARCHETYPES = {
+    3: ("Rotación corta / bajo uso", "#7f8c8d"),
+    1: ("Rotación perimetral", "#3498db"),
+    0: ("Interiores / reboteadores", "#e67e22"),
+    2: ("Anotadores y creadores de juego", "#e74c3c"),
+}
+
+
+def hallazgos_page(df_full):
+
+    colored_header(
+        label="Hallazgos",
+        description="DBSCAN vs. HDBSCAN vs. K-Means: qué método encuentra arquetipos reales",
+        color_name="light-blue-90",
+        )
+
+    st.markdown(f"""
+Esta página fija los parámetros y no tiene controles interactivos -- a diferencia de las páginas
+DBSCAN y HDBSCAN, que invitan a explorar, esta resume una conclusión ya buscada y verificada.
+
+**Metodología:** se usaron 6 estadísticas por partido -- {', '.join(FEATURES_HALLAZGOS)} -- estandarizadas
+(`StandardScaler`), sobre el dataset completo de {len(df_full):,} temporadas de jugador (2013 a 2024-25).
+Para DBSCAN se probó una grilla de `eps` y `min_samples`; para HDBSCAN, un rango de `min_cluster_size`
+entre 5 y 150; para K-Means, se fijó `k` igual a la cantidad de clusters de la mejor solución de DBSCAN,
+para poder comparar métricas directamente.
+""")
+
+    scaler = StandardScaler()
+    X = df_full[FEATURES_HALLAZGOS].copy()
+    Xs = scaler.fit_transform(X)
+
+    DBSCAN_EPS, DBSCAN_MIN_SAMPLES = 1.20, 6
+    db_labels = DBSCAN(eps=DBSCAN_EPS, min_samples=DBSCAN_MIN_SAMPLES).fit_predict(Xs)
+    db_n = len(set(db_labels)) - (1 if -1 in db_labels else 0)
+    db_noise = (db_labels == -1).mean() * 100
+    db_sil = silhouette_score(Xs, db_labels)
+    db_dbi = davies_bouldin_score(Xs, db_labels)
+
+    HDB_MIN_CLUSTER_SIZE = 20
+    hdb_clusterer = hdbscan.HDBSCAN(min_cluster_size=HDB_MIN_CLUSTER_SIZE, metric='euclidean',
+                                     gen_min_span_tree=True)
+    hdb_labels = hdb_clusterer.fit_predict(Xs)
+    hdb_n = len(set(hdb_labels)) - (1 if -1 in hdb_labels else 0)
+    hdb_noise = (hdb_labels == -1).mean() * 100
+    hdb_sil = silhouette_score(Xs, hdb_labels) if hdb_n >= 2 else float('nan')
+    hdb_dbi = davies_bouldin_score(Xs, hdb_labels) if hdb_n >= 2 else float('nan')
+
+    km = KMeans(n_clusters=db_n, init='k-means++', random_state=42, n_init=10)
+    km_labels = km.fit_predict(Xs)
+    km_sil = silhouette_score(Xs, km_labels)
+    km_dbi = davies_bouldin_score(Xs, km_labels)
+
+    st.markdown("#### Comparación de los tres métodos")
+    comparison = pd.DataFrame([
+        {"Método": "DBSCAN", "Parámetros": f"eps={DBSCAN_EPS}, min_samples={DBSCAN_MIN_SAMPLES}",
+         "Clusters": db_n, "Ruido": f"{db_noise:.1f}%", "Silhouette": round(db_sil, 3),
+         "Davies-Bouldin": round(db_dbi, 3)},
+        {"Método": "HDBSCAN", "Parámetros": f"min_cluster_size={HDB_MIN_CLUSTER_SIZE}",
+         "Clusters": hdb_n, "Ruido": f"{hdb_noise:.1f}%", "Silhouette": round(hdb_sil, 3),
+         "Davies-Bouldin": round(hdb_dbi, 3)},
+        {"Método": "K-Means (baseline)", "Parámetros": f"k={db_n}",
+         "Clusters": db_n, "Ruido": "0.0%", "Silhouette": round(km_sil, 3),
+         "Davies-Bouldin": round(km_dbi, 3)},
+    ])
+    st.dataframe(comparison, use_container_width=True, hide_index=True)
+
+    st.markdown(f"""
+**El silhouette de DBSCAN (0.454) se ve bien en la tabla, pero esconde un resultado degenerado:**
+del {db_n}-cluster que encuentra a `eps={DBSCAN_EPS}`, un {(pd.Series(db_labels).value_counts(normalize=True).iloc[0]*100):.1f}%
+de las temporadas caen en un solo cluster gigante ("todo el mundo"), y los otros {db_n - 1} clusters
+son grupos diminutos (4 a 18 filas) de temporadas estadísticamente extremas -- básicamente,
+DBSCAN aísla a un puñado de temporadas de superestrella como sus propios "clusters" en vez de
+encontrar arquetipos de jugador reales.
+
+**HDBSCAN es aún más extremo:** en ningún `min_cluster_size` probado (de 5 a 150) se encontró una
+solución con silhouette positivo y ruido razonable -- con valores chicos, decenas de micro-clusters
+y 85-95% de ruido; con valores más grandes, prácticamente el 100% de las temporadas quedan
+marcadas como ruido.
+
+**La razón de fondo:** las estadísticas de jugadores NBA no forman regiones de alta densidad
+separadas por vacíos -- son un espectro continuo de habilidad, desde jugadores de banca hasta
+superestrellas, sin límites naturales nítidos. Eso es exactamente lo que rompe a los métodos
+basados en densidad, y exactamente lo que **K-Means sí maneja bien** (no necesita vacíos de
+densidad entre grupos, solo centroides razonablemente separados). Por eso los 4 arquetipos de
+abajo salen de K-Means, no de DBSCAN ni HDBSCAN, pese a que el proyecto originalmente comparaba
+solo métodos de densidad.
+""")
+
+    st.divider()
+
+    # ---- PCA 2D projection, colored by K-Means archetype ----
+    st.markdown("#### Proyección 2D (PCA) coloreada por arquetipo")
+    pca = PCA(n_components=2, random_state=42)
+    coords = pca.fit_transform(Xs)
+    var_explained = pca.explained_variance_ratio_
+
+    df_plot = pd.DataFrame({
+        'PC1': coords[:, 0],
+        'PC2': coords[:, 1],
+        'Arquetipo': [ARCHETYPES[c][0] for c in km_labels],
+    })
+    color_map = {name: color for name, color in ARCHETYPES.values()}
+    fig_pca = px.scatter(
+        df_plot, x='PC1', y='PC2', color='Arquetipo',
+        color_discrete_map=color_map, opacity=0.5,
+        title=f"PCA de las 6 estadísticas (PC1+PC2 explican {var_explained.sum():.0%} de la varianza)",
+    )
+    fig_pca.update_layout(height=550)
+    st.plotly_chart(fig_pca, use_container_width=True)
+
+    st.divider()
+
+    # ---- Named archetypes with their statistical profile ----
+    st.markdown("#### Los 4 arquetipos (de K-Means)")
+    df_prof = X.copy()
+    df_prof['cluster'] = km_labels
+    profile = df_prof.groupby('cluster')[FEATURES_HALLAZGOS].mean().round(2)
+    counts = df_prof['cluster'].value_counts()
+
+    for cluster_id, (name, color) in ARCHETYPES.items():
+        row = profile.loc[cluster_id]
+        pct = counts[cluster_id] / len(df_prof) * 100
+        st.markdown(f"##### :{('gray' if color=='#7f8c8d' else 'blue' if color=='#3498db' else 'orange' if color=='#e67e22' else 'red')}[{name}] -- {counts[cluster_id]:,} temporadas ({pct:.1f}%)")
+        cols = st.columns(6)
+        # Not using style_metric_cards() here on purpose: it forces a white card
+        # background without adapting the label color, so labels disappear in dark
+        # theme. Plain st.metric already adapts colors to whatever theme is active.
+        labels_short = ['PTS', 'REB', 'AST', 'ROB', 'TAP', 'PER']
+        for col, label, val in zip(cols, labels_short, row.values):
+            col.metric(label, f"{val:.1f}")
+        st.write("")
+
+    st.divider()
+    st.markdown("""
+*Nota: el dataset se extendió para incluir la temporada 2024-25 (antes llegaba solo hasta
+2023-24), agregada desde Basketball-Reference.*
+""")

@@ -1,6 +1,6 @@
 # Clustering de Jugadores NBA por Densidad
 
-Dashboard interactivo para comparar DBSCAN y HDBSCAN sobre estadísticas de jugadores de la NBA (2013-2023), ajustando parámetros de clustering en vivo.
+Dashboard interactivo para comparar DBSCAN y HDBSCAN sobre estadísticas de jugadores de la NBA (2013-2025), ajustando parámetros de clustering en vivo.
 
 **[Ver dashboard en Streamlit →](https://clustering-comparison.streamlit.app/)**
 *(si aparece dormido, esperá unos segundos a que despierte — es normal en el free tier de Streamlit Cloud tras un tiempo sin visitas)*
@@ -25,7 +25,7 @@ codigos/
   style.css
 datos/bases/
   Player Per Game.csv  → estadísticas crudas por jugador/temporada
-  PPG_data.csv          → versión filtrada (2013-2023, sin columnas de porcentaje) que consume la app
+  PPG_data.csv          → versión filtrada (2013-2025, sin columnas de porcentaje) que consume la app
 datos/resultados/      → capturas del dashboard
 ```
 

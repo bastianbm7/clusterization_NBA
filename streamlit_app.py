@@ -49,14 +49,16 @@ def filter_data(df_):
     return df, columns_to_select
 
 # Read data
-df = pd.read_csv('https://raw.githubusercontent.com/bastianbm7/clusterization_NBA/main/datos/bases/PPG_data.csv')
+df_raw = pd.read_csv('https://raw.githubusercontent.com/bastianbm7/clusterization_NBA/main/datos/bases/PPG_data.csv')
+df = df_raw
 
 # Create menu on top of the page with all pages:
-# 1.- Home 
+# 1.- Home
 # 2.- DBSCAN
-# 3.- OPTICS
-menu_option = option_menu(None, ["Home", "DBSCAN", "HDBSCAN"],
-                          icons=['house-fill', 'bar-chart-fill', 'folder-fill', 'send-fill'],
+# 3.- HDBSCAN
+# 4.- Hallazgos
+menu_option = option_menu(None, ["Home", "DBSCAN", "HDBSCAN", "Hallazgos"],
+                          icons=['house-fill', 'bar-chart-fill', 'folder-fill', 'lightbulb-fill'],
                           menu_icon="cast", default_index=0, orientation="horizontal",
                           styles={
                               "container": {"padding": "0!important", "background-color": "#fafafa"},
@@ -64,19 +66,20 @@ menu_option = option_menu(None, ["Home", "DBSCAN", "HDBSCAN"],
                                   "nav-link": {"font-size": "17px", "text-align": "left", "margin": "12px", "--hover-color": "#fffff"},
                                   "nav-link-selected": {"background-color": "#95A5A6"},
                         })
-        
+
 # ---------------------
 # Page 1: Home
 if menu_option == "Home":
     pages.home()
 
-with st.sidebar:
-    colored_header(
-        label="Filtra tus datos",
-        description="Cambia los parámetros a tu medida",
-        color_name="red-90",
-        )
-    df, columns_to_select = filter_data(df)
+if menu_option in ("DBSCAN", "HDBSCAN"):
+    with st.sidebar:
+        colored_header(
+            label="Filtra tus datos",
+            description="Cambia los parámetros a tu medida",
+            color_name="red-90",
+            )
+        df, columns_to_select = filter_data(df)
 # ---------------------
 # Page 2: DBSCAN
 if menu_option == 'DBSCAN':
@@ -84,5 +87,9 @@ if menu_option == 'DBSCAN':
 
 if menu_option == 'HDBSCAN':
     pages.HDBSCAN_page(df)
-    
+
+# Page 4: Hallazgos -- fixed findings, uses the full unfiltered dataset
+if menu_option == 'Hallazgos':
+    pages.hallazgos_page(df_raw)
+
 
